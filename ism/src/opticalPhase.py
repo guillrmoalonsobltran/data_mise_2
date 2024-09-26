@@ -92,8 +92,9 @@ class opticalPhase(initIsm):
         :param Tr: Optical transmittance [-]
         :return: TOA image in irradiances [mW/m2]
         """
-        # TODO
-        return toa
+        toa_in_irradiances = Tr*toa*(pi/4)*(D/f)**2
+
+        return toa_in_irradiances
 
 
     def applySysMtf(self, toa, Hsys):
@@ -103,8 +104,8 @@ class opticalPhase(initIsm):
         :param Hsys: System MTF
         :return: TOA image in irradiances [mW/m2]
         """
-        # TODO
-        return toa_ft
+
+        return toa
 
     def spectralIntegration(self, sgm_toa, sgm_wv, band):
         """
@@ -114,7 +115,24 @@ class opticalPhase(initIsm):
         :param band: band
         :return: TOA image 2D in radiances [mW/m2]
         """
-        # TODO
-        return toa
+        isrf, wv_isrf = readIsrf(self.auxdir + self.ismConfig.isrffile, band)
+        isrf_integral = 0
+
+        wavelength_stepsize = sgm_wv[2]-sgm_wv[1]
+        for isrf_i in isrf:
+            isrf_integral += isrf_i*wavelength_stepsize
+        isrf_normalized = isrf/isrf_integral
+
+        toa = 0
+        [rows, columns, whatever] = sgm_toa.shape
+        spectrally_integrated_radiance = np.zeros((rows, columns))
+        for index_along, along_track in enumerate(range(rows)):
+            for index_across, across_track in enumerate(range(columns)):
+                interpolant_object = interp1d(sgm_wv, sgm_toa[along_track, across_track, :], fill_value=(0, 0), bounds_error=False)
+                toa_new = interpolant_object(wv_isrf*1000)
+
+                spectrally_integrated_radiance[index_along, index_across] = np.sum(toa_new * isrf_normalized * wavelength_stepsize)
+
+        return spectrally_integrated_radiance
 
 
