@@ -116,14 +116,11 @@ class opticalPhase(initIsm):
         :return: TOA image 2D in radiances [mW/m2]
         """
         isrf, wv_isrf = readIsrf(self.auxdir + self.ismConfig.isrffile, band)
-        isrf_integral = 0
 
         wavelength_stepsize = sgm_wv[2]-sgm_wv[1]
-        for isrf_i in isrf:
-            isrf_integral += isrf_i*wavelength_stepsize
+        isrf_integral = np.sum(isrf * wavelength_stepsize)
         isrf_normalized = isrf/isrf_integral
 
-        toa = 0
         [rows, columns, whatever] = sgm_toa.shape
         spectrally_integrated_radiance = np.zeros((rows, columns))
         for index_along, along_track in enumerate(range(rows)):

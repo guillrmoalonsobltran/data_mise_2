@@ -5,9 +5,7 @@ from l1b.src.initL1b import initL1b
 from common.io.writeToa import writeToa, readToa
 from common.src.auxFunc import getIndexBand
 from common.io.readFactor import readFactor, EQ_MULT, EQ_ADD, NC_EXT
-import numpy as np
 import os
-import matplotlib.pyplot as plt
 
 class l1b(initL1b):
 
@@ -17,6 +15,8 @@ class l1b(initL1b):
     def processModule(self):
 
         self.logger.info("Start of the L1B Processing Module")
+
+        toa_list = []
 
         for band in self.globalConfig.bands:
 
@@ -50,8 +50,11 @@ class l1b(initL1b):
             self.plotL1bToa(toa, self.outdir, band)
 
             self.logger.info("End of BAND " + band)
+            toa_list.append(toa)
 
         self.logger.info("End of the L1B Module!")
+
+        return toa_list
 
 
     def equalization(self, toa_measured, eq_add, eq_mult):
@@ -63,7 +66,6 @@ class l1b(initL1b):
         :return: TOA in DN, equalized
         """
         toa_real = (toa_measured - eq_add)/eq_mult
-        #TODO
         return toa_real
 
     def restoration(self,toa_real,gain):
@@ -74,10 +76,15 @@ class l1b(initL1b):
         :return: TOA in radiances [mW/sr/m2]
         """
         toa_L1B = toa_real*gain
+
         self.logger.debug('Sanity check. TOA in radiances after gain application ' + str(toa_L1B[1,-1]) + ' [mW/m2/sr]')
 
         return toa_L1B
 
     def plotL1bToa(self, toa_l1b, outputdir, band):
-        #TODO
-        a=1 # dummy
+        a = 1
+
+
+
+
+
