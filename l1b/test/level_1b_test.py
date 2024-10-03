@@ -18,6 +18,8 @@ myL1b.l1bConfig.do_equalization = False
 toa_list_no_eq = myL1b.processModule()
 '''
 ANSWER ALL THE QUESTIONS IN SECTION 6 FROM THE WORD DOCUMENT
+The algorithms implemented in this section are: EODP-ALG-L1B-1010 and EODP-ALG-L1B-1020
+So check them in the theoretical document when writing the report
 Question 1: DONE
 Check for all bands that the differences with respect to the output TOA (l1b_toa_) are <0.01% for at 
 least 3-sigma of the points.
