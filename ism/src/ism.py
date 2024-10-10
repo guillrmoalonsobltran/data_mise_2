@@ -30,7 +30,7 @@ class ism(initIsm):
             myOpt = opticalPhase(self.auxdir, self.indir, self.outdir)
             toa = myOpt.compute(sgm_toa, sgm_wv, band)
 
-            """
+
             # Detection Stage
             # -------------------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ class ism(initIsm):
             # -------------------------------------------------------------------------------
             myVcu = videoChainPhase(self.auxdir, self.indir, self.outdir)
             toa = myVcu.compute(toa, band)
-            """
+
             # Write output TOA
             # -------------------------------------------------------------------------------
             writeToa(self.outdir, self.globalConfig.ism_toa + band, toa)

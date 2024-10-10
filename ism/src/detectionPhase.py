@@ -104,7 +104,10 @@ class detectionPhase(initIsm):
         :param wv: Central wavelength of the band [m]
         :return: Toa in photons
         """
-        #TODO
+        E_in = toa*area_pix*tint/1e3
+        E_ph = (self.constants.h_planck*self.constants.speed_light)/wv
+
+        toa_ph = E_in/E_ph
         return toa_ph
 
     def phot2Electr(self, toa, QE):
@@ -114,7 +117,7 @@ class detectionPhase(initIsm):
         :param QE: Quantum efficiency [e-/ph]
         :return: toa in electrons
         """
-        #TODO
+        toae = toa*QE
         return toae
 
     def badDeadPixels(self, toa,bad_pix,dead_pix,bad_pix_red,dead_pix_red):
@@ -127,7 +130,18 @@ class detectionPhase(initIsm):
         :param dead_pix_red: Reduction in the quantum efficiency for the dead pixels [-, over 1]
         :return: toa in e- including bad & dead pixels
         """
-        #TODO
+        bad_pixels = int((bad_pix/100)*toa.shape[1])
+        dead_pixels = int((dead_pix/100)*toa.shape[1])
+
+        # Only 1 pixel is bad out of 150.
+        # We need to apply a reduction of TOA due to the pixel being bad.
+        # We select for this pixel number 5 at random.
+
+        toa[:, 5] = (1 - bad_pix_red)*toa[:, 5]
+
+        # 0 pixels are dead out of 150.
+        # TOA remains unchanged.
+
         return toa
 
     def prnu(self, toa, kprnu):
@@ -137,7 +151,8 @@ class detectionPhase(initIsm):
         :param kprnu: multiplicative factor to the standard normal deviation for the PRNU
         :return: TOA after adding PRNU [e-]
         """
-        #TODO
+        prnu = np.random.normal(0, 1, toa.shape[1])*kprnu
+        toa = toa*(1 + prnu)
         return toa
 
 
@@ -152,5 +167,8 @@ class detectionPhase(initIsm):
         :param ds_B_coeff: Empirical parameter of the model 6040 K
         :return: TOA in [e-] with dark signal
         """
-        #TODO
+        dsnu = np.abs(np.random.normal(0, 1, toa.shape[1]))*kdsnu
+        Sd = ds_A_coeff*((T/Tref)**3)*np.exp(-ds_B_coeff*(1/T - 1/Tref))
+        DS = Sd*(1 + dsnu)
+        toa = toa + DS
         return toa
