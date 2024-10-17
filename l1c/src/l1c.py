@@ -1,4 +1,4 @@
-
+import config.l1cConfig
 # LEVEL-1C
 
 from l1c.src.initL1c import initL1c
@@ -62,7 +62,25 @@ class l1c(initL1c):
         :param band: band
         :return: L1C radiances, L1C latitude and longitude in degrees
         '''
-        #TODO
+
+        m = mgrs.MGRS()
+        mgrs_tiles = set([])
+        tck = bisplrep(lat, lon, toa)
+
+        for i in range(toa.shape[0]):
+            for j in range(toa.shape[1]):
+                my_tile = str(m.toMGRS(lat[i, j], lon[i, j], True, self.l1cConfig.mgrs_tile_precision))
+                mgrs_tiles.add(my_tile)
+
+        mgrs_tiles = list(mgrs_tiles)
+        lat_l1c = np.zeros(len(mgrs_tiles))
+        lon_l1c = np.zeros(len(mgrs_tiles))
+        toa_l1c = np.zeros(len(mgrs_tiles))
+
+        for index in range(len(mgrs_tiles)):
+            (lat_l1c[index], lon_l1c[index]) = m.toLatLon(mgrs_tiles[index], True)
+            toa_l1c[index] = bisplev(lat_l1c[index], lon_l1c[index], tck)
+
         return lat_l1c, lon_l1c, toa_l1c
 
     def checkSize(self, lat,toa):

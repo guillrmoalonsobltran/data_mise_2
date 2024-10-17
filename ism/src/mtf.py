@@ -1,5 +1,5 @@
 from math import pi
-from config.ismConfig import ismConfig
+from config.ismConfig_before import ismConfig
 import numpy as np
 import math
 import matplotlib.pyplot as plt
