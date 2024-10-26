@@ -22,14 +22,14 @@ class detectionPhase(initIsm):
         # -------------------------------------------------------------------------------
         self.logger.info("EODP-ALG-ISM-2010: Irradiances to Photons")
         area_pix = self.ismConfig.pix_size * self.ismConfig.pix_size # [m2]
-        toa = self.irrad2Phot(toa, area_pix, self.ismConfig.t_int, self.ismConfig.wv[int(band[-1])])
+        toa, conv_i2p = self.irrad2Phot(toa, area_pix, self.ismConfig.t_int, self.ismConfig.wv[int(band[-1])])
 
         self.logger.debug("TOA [0,0] " +str(toa[0,0]) + " [ph]")
 
         # Photon to electrons conversion
         # -------------------------------------------------------------------------------
         self.logger.info("EODP-ALG-ISM-2030: Photons to Electrons")
-        toa = self.phot2Electr(toa, self.ismConfig.QE)
+        toa, conv_p2e = self.phot2Electr(toa, self.ismConfig.QE)
 
         self.logger.debug("TOA [0,0] " +str(toa[0,0]) + " [e-]")
 
@@ -92,7 +92,7 @@ class detectionPhase(initIsm):
             saveas_str = saveas_str + '_alt' + str(idalt)
             plotF([], toa[idalt,:], title_str, xlabel_str, ylabel_str, self.outdir, saveas_str)
 
-        return toa
+        return toa, conv_i2p, conv_p2e
 
 
     def irrad2Phot(self, toa, area_pix, tint, wv):
@@ -104,11 +104,11 @@ class detectionPhase(initIsm):
         :param wv: Central wavelength of the band [m]
         :return: Toa in photons
         """
-        E_in = toa*area_pix*tint/1e3
         E_ph = (self.constants.h_planck*self.constants.speed_light)/wv
+        conv_i2p = ((area_pix*tint/1e3)/E_ph)
 
-        toa_ph = E_in/E_ph
-        return toa_ph
+        toa_ph = toa*conv_i2p
+        return toa_ph, conv_i2p
 
     def phot2Electr(self, toa, QE):
         """
@@ -117,8 +117,9 @@ class detectionPhase(initIsm):
         :param QE: Quantum efficiency [e-/ph]
         :return: toa in electrons
         """
-        toae = toa*QE
-        return toae
+        conv_p2e = QE
+        toae = toa*conv_p2e
+        return toae, conv_p2e
 
     def badDeadPixels(self, toa,bad_pix,dead_pix,bad_pix_red,dead_pix_red):
         """

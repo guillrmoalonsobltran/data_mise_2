@@ -1,21 +1,23 @@
 from l1b.src.l1b import l1b, readToa
 import matplotlib.pyplot as plt
 
-# Directory - this is the common directory for the execution of the E2E, all modules
 auxdir = r'C:\\Users\\guill\\Documents\\Universidad\\Earth Observation Data Processing\\EODP\\auxiliary'
 indir = r"C:\\Users\\guill\\Documents\\Universidad\\Earth Observation Data Processing\\EODP_TER_2021\\EODP-TS-L1B\\input"
-outdir = r"C:\\Users\\guill\\Documents\\Universidad\\Earth Observation Data Processing\\EODP_TER_2021\\EODP-TS-L1B\\output_2"
+outdir_eq = r"C:\\Users\\guill\\Documents\\Universidad\\Earth Observation Data Processing\\EODP_TER_2021\\EODP-TS-L1B\\output_eq"
+outdir_noeq = r"C:\\Users\\guill\\Documents\\Universidad\\Earth Observation Data Processing\\EODP_TER_2021\\EODP-TS-L1B\\output_noeq"
 outdir_reference = r"C:\\Users\\guill\\Documents\\Universidad\\Earth Observation Data Processing\\EODP_TER_2021\\EODP-TS-L1B\\output"
 
 # Initialise the ISM
-myL1b = l1b(auxdir, indir, outdir)
+myL1b_eq = l1b(auxdir, indir, outdir_eq)
+myL1b_noeq = l1b(auxdir, indir, outdir_noeq)
 
 # Obtain the restored signal (toa) with equalization
-toa_list_eq = myL1b.processModule()
+myL1b_eq.l1bConfig.do_equalization = True
+toa_list_eq = myL1b_eq.processModule()
 
 # Obtain the restored signal (toa) without equalization
-myL1b.l1bConfig.do_equalization = False
-toa_list_no_eq = myL1b.processModule()
+myL1b_noeq.l1bConfig.do_equalization = False
+toa_list_noeq = myL1b_noeq.processModule()
 '''
 ANSWER ALL THE QUESTIONS IN SECTION 6 FROM THE WORD DOCUMENT
 The algorithms implemented in this section are: EODP-ALG-L1B-1010 and EODP-ALG-L1B-1020
@@ -39,11 +41,12 @@ for index, (toa_eq, reference_toa) in enumerate(zip(toa_list_eq, reference_toa_l
 
     # Create a plot
     fig = plt.figure(index)
-    plt.plot(element_number, toa_error)
+    plt.plot(element_number, toa_error, label="TOA Error")
     plt.axhline(y=0.01, color='red', linestyle='--', label='% Error = 0.01')
     plt.title(f'Error in TOA with respect to the reference output for VNIR-{index}')
     plt.xlabel('Element number in TOA matrix')
     plt.ylabel('% Error in TOA wrt reference output')
+    plt.legend()
     plt.show()
 
 '''
@@ -52,6 +55,7 @@ For the central ALT position, plot the restored signal (l1b_toa), and the TOA af
 (ism_toa_isrf). Explain the differences.
 De los audios:
 The blue line is the restored signal (radiances) after calibration. Why are they different from the ism_toa_isrf?
+En la grafica roja y azul lo de los extremos es parriba y pabajo de golpe por las discontinuidades creadas por el border effect
 '''
 # Retrieve the TOA values after the ISRF from the input folder
 toa_after_isrf_list = []
@@ -79,7 +83,7 @@ Do another run of the L1B with the equalization enabled to false. Plot the resto
 and for the case with the equalization set to True. Compare.
 '''
 
-for index, (toa_eq, toa_no_eq) in enumerate(zip(toa_list_eq, toa_list_no_eq)):
+for index, (toa_eq, toa_no_eq) in enumerate(zip(toa_list_eq, toa_list_noeq)):
 
     # Obtain the central ALT row
     toa_eq = toa_eq[49, :]

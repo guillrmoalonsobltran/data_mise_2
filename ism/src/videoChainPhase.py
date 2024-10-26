@@ -15,7 +15,7 @@ class videoChainPhase(initIsm):
         # Electrons to Voltage - read-out & amplification
         # -------------------------------------------------------------------------------
         self.logger.info("EODP-ALG-ISM-3010: Electrons to Voltage – Read-out and Amplification")
-        toa = self.electr2Volt(toa,
+        toa, conv_e2v = self.electr2Volt(toa,
                          self.ismConfig.OCF,
                          self.ismConfig.ADC_gain)
 
@@ -24,7 +24,7 @@ class videoChainPhase(initIsm):
         # Digitisation
         # -------------------------------------------------------------------------------
         self.logger.info("EODP-ALG-ISM-3020: Voltage to Digital Numbers – Digitisation")
-        toa = self.digitisation(toa,
+        toa, conv_v2d, perc_sat = self.digitisation(toa,
                           self.ismConfig.bit_depth,
                           self.ismConfig.min_voltage,
                           self.ismConfig.max_voltage)
@@ -43,7 +43,7 @@ class videoChainPhase(initIsm):
             saveas_str = saveas_str + '_alt' + str(idalt)
             plotF([], toa[idalt,:], title_str, xlabel_str, ylabel_str, self.outdir, saveas_str)
 
-        return toa
+        return toa, conv_e2v, conv_v2d, perc_sat
 
     def electr2Volt(self, toa, OCF, gain_adc):
         """
@@ -55,8 +55,9 @@ class videoChainPhase(initIsm):
         :param gain_adc: Gain of the Analog-to-digital conversion [-]
         :return: output toa in [V]
         """
-        toa = toa*OCF*gain_adc
-        return toa
+        conv_e2v = OCF*gain_adc
+        toa = toa*conv_e2v
+        return toa, conv_e2v
 
     def digitisation(self, toa, bit_depth, min_voltage, max_voltage):
         """
@@ -67,7 +68,18 @@ class videoChainPhase(initIsm):
         :param max_voltage: maximum voltage
         :return: toa in digital counts
         """
-        toa_dn = np.round((toa*(2**bit_depth - 1))/(max_voltage - min_voltage))
-        toa_dn[toa_dn > 4095] = 4095
-        return toa_dn
+        conv_v2d = (2**bit_depth - 1)/(max_voltage - min_voltage)
+        toa_dn = np.round(toa*conv_v2d)
+
+        # Number of saturated pixels in the image
+        sat_pixels = 0
+
+        for index, element in enumerate(toa_dn.flat):
+            if element > 4095:
+                sat_pixels += 1
+                toa_dn.flat[index] = 4095
+
+        perc_sat = (sat_pixels / toa_dn.size) * 100
+
+        return toa_dn, conv_v2d, perc_sat
 

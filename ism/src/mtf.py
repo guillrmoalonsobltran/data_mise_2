@@ -1,5 +1,5 @@
 from math import pi
-from config.ismConfig_before import ismConfig
+from config.ismConfig import ismConfig
 import numpy as np
 import math
 import matplotlib.pyplot as plt
@@ -75,7 +75,7 @@ class mtf:
         self.plotMtf(Hdiff, Hdefoc, Hwfe, Hdet, Hsmear, Hmotion, Hsys, nlines, ncolumns, fnAct, fnAlt, directory, band)
 
 
-        return Hsys
+        return Hsys, fnAlt, fnAct
 
     def freq2d(self,nlines, ncolumns, D, lambd, focal, w):
         """

@@ -43,14 +43,13 @@ class l1b(initL1b):
             # -------------------------------------------------------------------------------
             self.logger.info("EODP-ALG-L1B-1020: Absolute radiometric gain application (restoration)")
             toa = self.restoration(toa, self.l1bConfig.gain[getIndexBand(band)])
+            toa_list.append(toa)
 
             # Write output TOA
             # -------------------------------------------------------------------------------
             writeToa(self.outdir, self.globalConfig.l1b_toa + band, toa)
-            self.plotL1bToa(toa, self.outdir, band)
-
             self.logger.info("End of BAND " + band)
-            toa_list.append(toa)
+
 
         self.logger.info("End of the L1B Module!")
 
@@ -80,9 +79,6 @@ class l1b(initL1b):
         self.logger.debug('Sanity check. TOA in radiances after gain application ' + str(toa_L1B[1,-1]) + ' [mW/m2/sr]')
 
         return toa_L1B
-
-    def plotL1bToa(self, toa_l1b, outputdir, band):
-        a = 1
 
 
 

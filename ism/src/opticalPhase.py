@@ -31,6 +31,7 @@ class opticalPhase(initIsm):
         # -------------------------------------------------------------------------------
         self.logger.info("EODP-ALG-ISM-1010: Spectral modelling. ISRF")
         toa = self.spectralIntegration(sgm_toa, sgm_wv, band)
+        toa_isrf = toa
 
         self.logger.debug("TOA [0,0] " +str(toa[0,0]) + " [e-]")
 
@@ -38,10 +39,10 @@ class opticalPhase(initIsm):
             saveas_str = self.globalConfig.ism_toa_isrf + band
             writeToa(self.outdir, saveas_str, toa)
 
-        # Radiance to Irradiance conversion
+                # Radiance to Irradiance conversion
         # -------------------------------------------------------------------------------
         self.logger.info("EODP-ALG-ISM-1020: Radiances to Irradiances")
-        toa = self.rad2Irrad(toa,
+        toa, conv_factor = self.rad2Irrad(toa,
                              self.ismConfig.D,
                              self.ismConfig.f,
                              self.ismConfig.Tr)
@@ -53,7 +54,7 @@ class opticalPhase(initIsm):
         # Calculation and application of the system MTF
         self.logger.info("EODP-ALG-ISM-1030: Spatial modelling. PSF/MTF")
         myMtf = mtf(self.logger, self.outdir)
-        Hsys = myMtf.system_mtf(toa.shape[0], toa.shape[1],
+        Hsys, fnAlt, fnAct = myMtf.system_mtf(toa.shape[0], toa.shape[1],
                                 self.ismConfig.D, self.ismConfig.wv[getIndexBand(band)], self.ismConfig.f, self.ismConfig.pix_size,
                                 self.ismConfig.kLF, self.ismConfig.wLF, self.ismConfig.kHF, self.ismConfig.wHF,
                                 self.ismConfig.defocus, self.ismConfig.ksmear, self.ismConfig.kmotion,
@@ -81,7 +82,7 @@ class opticalPhase(initIsm):
             saveas_str = saveas_str + '_alt' + str(idalt)
             plotF([], toa[idalt,:], title_str, xlabel_str, ylabel_str, self.outdir, saveas_str)
 
-        return toa
+        return toa, toa_isrf, conv_factor, Hsys, fnAlt, fnAct
 
     def rad2Irrad(self, toa, D, f, Tr):
         """
@@ -92,9 +93,10 @@ class opticalPhase(initIsm):
         :param Tr: Optical transmittance [-]
         :return: TOA image in irradiances [mW/m2]
         """
-        toa_in_irradiances = Tr*toa*(pi/4)*(D/f)**2
+        conv_factor = Tr*(pi/4)*(D/f)**2
+        toa_in_irradiances = toa*conv_factor
 
-        return toa_in_irradiances
+        return toa_in_irradiances, conv_factor
 
 
     def applySysMtf(self, toa, Hsys):
