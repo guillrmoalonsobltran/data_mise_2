@@ -14,7 +14,7 @@ toa_list_optical, toa_list_isrf, toa_list_final, conv_factor_list, \
     conv_e2v_list, conv_v2d_list, perc_sat_list = myIsm.processModule()
 
 """
-Question 1: DONE
+Question 1:
 Check for all bands that the differences with respect to the output TOA (ism_toa_isrf) are <0.01% for 
 at least 3-sigma of the points.
 """
@@ -42,7 +42,7 @@ for index, (toa, reference_toa) in enumerate(zip(toa_list_isrf, reference_toa_li
     plt.show()
 
 """
-Question 2: DONE
+Question 2:
 Check for all bands that the differences with respect to the output TOA (ism_toa_optical) are <0.01% 
 for at least 3-sigma of the points.
 """
@@ -70,11 +70,9 @@ for index, (toa, reference_toa) in enumerate(zip(toa_list_optical, reference_toa
     plt.show()
 
 """
-Question 3: DONE
+Question 3: 
 What is the radiance to irradiance conversion factor for each band. What are the units of the TOA at 
 this stage.
-Answer to the second question: 
-In the function rad2Irrad: Input: TOA image in radiances [mW/sr/m2]. Output: TOA image in irradiances [mW/m2]
 """
 CF = conv_factor_list
 data = [
@@ -90,23 +88,9 @@ table.auto_set_font_size(False)
 table.set_fontsize(16)
 plt.show()
 """
-Question 4: DONE
+Question 4:
 Plot for all bands the System MTF across and along track (for the central pixels). Report the MTF at 
 the Nyquist frequency. Explain whether this is a decent or mediocre value and why. 
-
-Answer: 
-The higher the y-axis (the MTF), the better you can see objects with the spatial resolution specified in the x-axis
-The bigger the area under the MTF graph, the lower the PSF, the more resolution your instrument has 
-(i.e., the better you can see/resolve objects). Lower psf means a narrower graph (como una distribución normal 
-estrechada) and higher psf means a wider graph (como una distribución normal pero muy gorda), el eje x de esas 
-gráficas es espacio, y el eje y ni idea.
-We are not able to resolve objects with a spatial frequency above the Nyquist frequency (i.e., we can´t resolve any 
-object with a spatial frequency to the right of the Nyquist frequency. The spatial resolution in the x-axis is 1/size 
-of the object. That is why smaller objects are larger x-axis values
-The Nyquist frequency is = 1/(2*size of the pixel). So when its normalized by (1/w) =(1/size of the pixel) we get 0.5.
-If the MTF value of your instrument at the Nyquist frequency is = 0. You don´t have aliasing. But you have a bad 
-response close to the Nyqusit frequency because the MTF is 0 at Nyquist. It's a trade-off. In general we target 
-instruments with a response (MTF) of 0.3-0.4 at the Nyquist frequency.
 """
 nyquist_MTF = []
 for index, (system_MTF, fnAct) in enumerate(zip(system_MTF_list, fnAct_list)):
@@ -156,30 +140,9 @@ table.auto_set_font_size(False)
 table.set_fontsize(16)
 plt.show()
 """
-Question 5: DONE
+Question 5:
 Explain the cause of the border effect introduced by the spatial filter (MTF) and what would be an 
 appropriate solution (if any). How many pixel lines does it affect (roughly).
-
-Theory: A convolution is a mathematical operation by which you sweep across an image and multiply each zone 
-with a kernel (the zone is the number of pixels equivalent to the kernel size). A kernel, also called a filter or mask,
-is a typically small matrix by which you multiply each zone of the input image. Conceptually, you add (or subtract), 
-the contribution of neighbouring pixels to a given pixel (i,j). Kernels and convolutions are widely used instruments 
-in image processing. For the first pixel, the convolution will multiply the kernel with non-existent pixels.
-Usually these imaginary pixels are zero-padded.
-
-Answer: We are calculating the response of the pixels using convolution. A process in which the pixel's response is 
-affected by the pixels in its surroundings. Therefore, when we apply the kernel in the borders (and specially 
-in the corners), we don´t have sufficient information to perform the convolution and the response becomes non-smooth.
-There are different strategies to make up the missing information so the pixel response at the edges is smoother.
-
-When we convolute, we asign energy from neighbouring pixels. That's why, if zero-padding is used, at the borders 
-the energy goes down because we are performing convolution with zeros. The amount of signal assigned at the border 
-pixels is lower, and a contrast is introduced.
-
-ZOOM IN THE PLOTS IN THE REPORT TO SHOW THE BORDER EFFECT. 
-For the central row of all bands, the first pixel is very different from the rest. Pixels 2 to 4 show also some 
-relevant jumps. And then from pixels 4 to 8 the smoothing out finishes so that from there on we cannot notice it. 
-And the same happens to the pixels at the further end.
 """
 for index, toa in enumerate(toa_list_optical):
     rows, columns = toa.shape
@@ -195,6 +158,6 @@ plt.ylabel('TOA signal')
 plt.legend()
 plt.show()
 """
-Question 6: DONE in the folder
+Question 6:
 Plot the TOA for all bands after the optical stage (with Panoply).
 """

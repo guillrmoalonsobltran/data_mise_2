@@ -14,7 +14,7 @@ toa_list_optical, toa_list_isrf, toa_list_final, conv_factor_list, \
     conv_e2v_list, conv_v2d_list, perc_sat_list = myIsm.processModule()
 
 """
-Question 1: DONE
+Question 1:
 Check for all bands that the differences with respect to the output TOA (ism_toa_) are <0.01% for at 
 least 3-sigma of the points.
 """
@@ -42,25 +42,9 @@ for index, (toa, reference_toa) in enumerate(zip(toa_list_final, reference_toa_l
     plt.show()
 
 """
-Question 2: DONE
+Question 2: 
 What is the irradiance to photons, photons to electrons, electrons to Volts, and volts to Digital 
 numbers conversion factor for all bands. What are the units of the TOA at each stage.
-
-1. Irradiance to photons:
-Input: TOA in irradiances [mW/m2]
-Output: TOA in photons [ph]
-
-2. Photons to electrons:
-Input: TOA in photons [ph]
-Output: TOA in electrons [e-]
-
-3. Electrons to Volts:
-Input: TOA in electrons [e-]
-Output: TOA in volts [V]
-
-4. Volts to digital numbers.
-Input: TOA in volts [V]
-Output: TOA in digital counts
 """
 I2P = conv_i2p_list
 P2E = conv_p2e_list
@@ -84,13 +68,16 @@ table.set_fontsize(16)
 plt.show()
 """
 Question 3:
-Explain why there are ‘stripes’ in the image, and why they are in the ALT direction.
-
-PUT WHATEVER PLOT OF THE FOLDER TO ANSWER THIS. OR, BETTER, ANSWER QUESTION 5 BEFORE QUESTION 3.
+Plot the TOA for all bands after the detection and the VCU stages (Panoply).
 """
 
 """
 Question 4:
+Explain why there are ‘stripes’ in the image, and why they are in the ALT direction.
+"""
+
+"""
+Question 5:
 For all bands, check whether there are any saturated pixels. Quantify the percentage of saturated 
 pixels per band.
 """
@@ -107,8 +94,3 @@ table = ax.table(cellText=data, colLabels=column_labels, cellLoc='center', loc='
 table.auto_set_font_size(False)
 table.set_fontsize(16)
 plt.show()
-"""
-Question 5: DONE
-Plot the TOA for all bands after the detection and the VCU stages (Panoply).
-THE PLOTS ARE ALREADY IN THE FOLDER
-"""

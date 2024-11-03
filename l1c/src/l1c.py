@@ -20,6 +20,8 @@ class l1c(initL1c):
 
         self.logger.info("Start of the L1C Processing Module")
 
+        toa_l1c_list = []
+
         for band in self.globalConfig.bands:
 
             self.logger.info("Start of BAND " + band)
@@ -34,6 +36,8 @@ class l1c(initL1c):
             # -------------------------------------------------------------------------------
             lat_l1c, lon_l1c, toa_l1c = self.l1cProjtoa(lat, lon, toa, band)
 
+            toa_l1c_list.append(toa_l1c)
+
             # Write output TOA
             # -------------------------------------------------------------------------------
             writeL1c(self.outdir, self.globalConfig.l1c_toa + band, lat_l1c, lon_l1c, toa_l1c)
@@ -41,6 +45,8 @@ class l1c(initL1c):
             self.logger.info("End of BAND " + band)
 
         self.logger.info("End of the L1C Module!")
+
+        return toa_l1c_list
 
 
     def l1cProjtoa(self, lat, lon, toa, band):
@@ -81,6 +87,16 @@ class l1c(initL1c):
             (lat_l1c[index], lon_l1c[index]) = m.toLatLon(mgrs_tiles[index], True)
             toa_l1c[index] = bisplev(lat_l1c[index], lon_l1c[index], tck)
 
+        # Get the sorted indices of the main array
+        sorted_indices = np.argsort(toa_l1c)
+
+        # Sort all arrays using the same indices
+        lat_l1c = lat_l1c[sorted_indices]
+        lon_l1c = lon_l1c[sorted_indices]
+        toa_l1c = toa_l1c[sorted_indices]
+
+        self.plotL1cToa(lat_l1c, lon_l1c, toa_l1c, band)
+
         return lat_l1c, lon_l1c, toa_l1c
 
     def checkSize(self, lat,toa):
@@ -92,3 +108,21 @@ class l1c(initL1c):
         :return: NA
         '''
         #TODO
+
+    def plotL1cToa(self, lat_l1c, lon_l1c, toa_l1c, band):
+        jet = cm.get_cmap('jet', len(lat_l1c))
+        toa_l1c[np.argwhere(toa_l1c < 0)] = 0
+        max_toa = np.max(toa_l1c)
+        # Plot stuff
+        fig = plt.figure(figsize=(20, 10))
+        clr = np.zeros(len(lat_l1c))
+        for ii in range(len(lat_l1c)):
+            clr = jet(toa_l1c[ii] / max_toa)
+            plt.plot(lon_l1c[ii], lat_l1c[ii], '.', color=clr, markersize=10)
+        plt.title('Projection on ground', fontsize=20)
+        plt.xlabel('Longitude [deg]', fontsize=16)
+        plt.ylabel('Latitude [deg]', fontsize=16)
+        plt.grid()
+        plt.axis('equal')
+        plt.savefig(self.outdir + 'toa_' + band + '.png')
+        plt.close(fig)

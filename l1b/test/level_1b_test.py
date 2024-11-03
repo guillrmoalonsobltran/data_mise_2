@@ -19,10 +19,7 @@ toa_list_eq = myL1b_eq.processModule()
 myL1b_noeq.l1bConfig.do_equalization = False
 toa_list_noeq = myL1b_noeq.processModule()
 '''
-ANSWER ALL THE QUESTIONS IN SECTION 6 FROM THE WORD DOCUMENT
-The algorithms implemented in this section are: EODP-ALG-L1B-1010 and EODP-ALG-L1B-1020
-So check them in the theoretical document when writing the report
-Question 1: DONE
+Question 1:
 Check for all bands that the differences with respect to the output TOA (l1b_toa_) are <0.01% for at 
 least 3-sigma of the points.
 '''
@@ -50,12 +47,9 @@ for index, (toa_eq, reference_toa) in enumerate(zip(toa_list_eq, reference_toa_l
     plt.show()
 
 '''
-Question 2: DONE PERO NO SÉ QUÉ TÍTULO PONERLE AL GRÁFICO PORQUE NO SÉ QUÉ SIGNIFICA
+Question 2:
 For the central ALT position, plot the restored signal (l1b_toa), and the TOA after the ISRF 
 (ism_toa_isrf). Explain the differences.
-De los audios:
-The blue line is the restored signal (radiances) after calibration. Why are they different from the ism_toa_isrf?
-En la grafica roja y azul lo de los extremos es parriba y pabajo de golpe por las discontinuidades creadas por el border effect
 '''
 # Retrieve the TOA values after the ISRF from the input folder
 toa_after_isrf_list = []
@@ -78,7 +72,7 @@ for index, (toa_eq, toa_after_isrf) in enumerate(zip(toa_list_eq, toa_after_isrf
     plt.legend()
     plt.show()
 '''
-Question 3: DONE
+Question 3:
 Do another run of the L1B with the equalization enabled to false. Plot the restored signal for this case 
 and for the case with the equalization set to True. Compare.
 '''
@@ -106,5 +100,4 @@ for index, (toa_eq, toa_no_eq) in enumerate(zip(toa_list_eq, toa_list_noeq)):
 Question 4:
 Can you explain why the restoration for VNIR-1 to VNIR-3 is “blocked” for radiances above 
 approximately 200 mW/sr/m2?
-
 '''
